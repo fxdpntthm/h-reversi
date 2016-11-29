@@ -18,7 +18,7 @@ main = do
   print $ "starting canvas"
   blankCanvas 3000 {events = ["mousedown"] } $ \context -> forever boardV context
 
-sampleData :: TVar (Map Cord Disc) -> IO ()
+sampleData :: TVar Board -> IO ()
 sampleData boardV = atomically $ do
   board <- readTVar boardV
   writeTVar boardV (fromList [((-1,-1), Black),
@@ -26,7 +26,7 @@ sampleData boardV = atomically $ do
                               ((0,0), Black),
                               ((0,-1), White)])
 
-viewer :: TVar (Map Cord Disc) -> DeviceContext ->IO ()
+viewer :: TVar Board -> DeviceContext ->IO ()
 viewer boardV context = do
   let (cw, ch, sz) = (width context, height context, min cw ch)
   board <- atomically $ readTVar boardV
@@ -56,7 +56,7 @@ viewer boardV context = do
     if (board == board') then retry else return ()
   viewer boardV context
 
-play :: TVar (Map Cord Disc) -> DeviceContext -> Disc -> IO ()
+play :: TVar Board -> DeviceContext -> Disc -> IO ()
 play boardV context turn = do
   let (cw, ch, sz) = (width context, height context, min cw ch)
   print $ "waiting for turn: " ++ show turn
@@ -78,7 +78,7 @@ play boardV context turn = do
       Nothing     -> return turn
   play boardV context turn'
 
-forever :: TVar (Map (Int, Int) Disc) -> DeviceContext -> IO ()
+forever :: TVar Board -> DeviceContext -> IO ()
 forever boardV context = do
         forkIO $ viewer boardV context
         play boardV context White
