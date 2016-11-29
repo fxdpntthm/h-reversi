@@ -4,10 +4,32 @@ module Grid where
 
 import           Control.Applicative
 import           Data.List.Split
+import           Data.Map            (Map)
 import           Data.Text           hiding (chunksOf)
 import           Debug.Trace
 import           Disc
 import           Graphics.Blank
+-- | Coordinate system goes from -4 to 3
+type Cord = (Int, Int)
+minX :: Int
+minX = -4
+
+maxX :: Int
+maxX = 3
+
+minY :: Int
+minY = -4
+
+maxY :: Int
+maxY = 3
+
+type Board = Map Cord Disc
+
+-- | Orientation of the line
+-- whether it is North, south east, west, south-east, etc
+data Direction = N | NE | E | SE | S | SW | W | NW
+  deriving (Show, Eq, Ord)
+
 grid w h = do
         let sz = min w h
         let sqSize = sz / 9
@@ -24,7 +46,6 @@ grid w h = do
         stroke()
         restore()
 
-
 gridCord n = [(x,y) | x <- [0..n-1], y <- [0..n-1]]
 
 computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 + y * sz, sz)
@@ -40,6 +61,23 @@ pointToSq (x,y) w h = validate $
 
 -- returns a Nothing if click is out of range
 validate :: Maybe Cord -> Maybe Cord
-validate c@(Just (x , y)) = if (x > 3 || x < -4) || (y > 3 || y < -4)
+validate c@(Just (x , y)) = if (x > maxX || x < minX) || (y > maxY || y < minY)
   then Nothing else c
 validate Nothing = Nothing
+
+
+adjacent :: Cord -> [Cord]
+adjacent (x, y) = Prelude.filter (\(a,b) -> a >= minX && a <= maxX
+                                   && b >= minY && b <= maxY && (a,b) /= (x,y))
+  $ (,) <$> [ x-1..x+1 ] <*> [ y-1..y+1 ]
+
+direction :: Cord -> Cord -> Direction
+direction (nc_x, nc_y) (oc_x, oc_y)
+  | (nc_x > oc_x) && (nc_y > oc_y) = NE
+  | (nc_x == oc_x) && (nc_y > oc_y) = N
+  | (nc_x < oc_x) && (nc_y > oc_y) = NW
+  | (nc_x < oc_x) && (nc_y == oc_y) = W
+  | (nc_x < oc_x) && (nc_y < oc_y) = SW
+  | (nc_x == oc_x) && (nc_y < oc_y) = S
+  | (nc_x > oc_x) && (nc_y < oc_y) = SE
+  | (nc_x > oc_x) && (nc_y == oc_y) = E
