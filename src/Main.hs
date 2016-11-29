@@ -4,7 +4,7 @@ module Main where
 import           Control.Concurrent
 import           Control.Concurrent.STM
 import           Control.Concurrent.STM.TVar
-import           Data.Map
+import           Data.Map                    (Map, fromList)
 import qualified Data.Map                    as Map
 import           Debug.Trace
 import           Disc
@@ -69,7 +69,7 @@ play boardV context turn = do
     case sq of
       Just pos -> case Map.lookup pos board of
                     Nothing ->
-                      if (isValidMove board turn)
+                      if (isValidMove pos board turn)
                       then do writeTVar boardV (Map.insert pos turn board)
                               return $ swap turn
                       else return turn
@@ -82,6 +82,26 @@ forever :: TVar Board -> DeviceContext -> IO ()
 forever boardV context = do
         forkIO $ viewer boardV context
         play boardV context White
+-- | It is a valid move if
+-- 1) The current pos is empty
+-- 2) There is an adjacent square with opposite colored disc
+-- 3) placing the disc creates a sandwich
+isValidMove :: Cord -> Map Cord Disc -> Disc -> Bool
+isValidMove pos board turn = isEmptySquare pos board
+  && isAdjacentSquareOpposite pos board turn
 
-isValidMove :: Map Cord Disc -> Disc -> Bool
-isValidMove board turn = True
+isAdjacentSquareOpposite :: Cord -> Map Cord Disc -> Disc -> Bool
+isAdjacentSquareOpposite pos board turn = not . null $
+  filter (\e -> e /= Nothing && (e == (Just $ swap turn)))
+  $ fmap ((flip Map.lookup) sampleBoard)
+  $ adjacent pos
+
+isEmptySquare :: Cord -> Map Cord Disc -> Bool
+isEmptySquare pos board = (Map.lookup pos board) == Nothing
+
+
+sampleBoard :: Map Cord Disc
+sampleBoard = fromList [((-1,-1), Black),
+                              ((-1,0), White),
+                              ((0,0), Black),
+                              ((0,-1), White)]
