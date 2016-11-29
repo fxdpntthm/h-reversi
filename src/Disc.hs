@@ -17,7 +17,7 @@ drawDisc radius disc = do
   fillStyle $ pack $ clr disc
   fill()
   lineWidth 5
-  strokeStyle "cyan"
+  strokeStyle $ pack $ clr disc
   stroke()
 
 clr :: Disc -> String

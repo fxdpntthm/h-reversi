@@ -15,17 +15,16 @@ main = do
   boardV <- newTVarIO Map.empty
   -- generate some static data for rendering
   sampleData boardV
+  print $ "starting canvas"
   blankCanvas 3000 {events = ["mousedown"] } $ \context -> forever boardV context
 
 sampleData :: TVar (Map Cord Disc) -> IO ()
 sampleData boardV = atomically $ do
   board <- readTVar boardV
-  writeTVar boardV (fromList [((-4,-4), White),
-                              ((-1,-1), Black),
+  writeTVar boardV (fromList [((-1,-1), Black),
                               ((-1,0), White),
                               ((0,0), Black),
-                              ((0,-1), White),
-                              ((3,3), Black)])
+                              ((0,-1), White)])
 
 viewer :: TVar (Map Cord Disc) -> DeviceContext ->IO ()
 viewer boardV context = do

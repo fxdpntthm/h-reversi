@@ -17,7 +17,7 @@ grid w h = do
         beginPath()
         save()
         translate (w / 2, h / 2)
-        lineWidth 7
+        lineWidth 3
         -- strokeStyle "cyan"
         -- sequence_ $ computeSquare (-sz/2, -sz/2) sqSize <$> gridCord 9
         -- stroke()
@@ -25,13 +25,15 @@ grid w h = do
         beginPath()
         strokeStyle "black"
         sequence_ $ computeSquare (-sz/2, -sz/2) sqSize <$> gridCord 8
+        fillStyle "green"
+        fill()
         stroke()
         restore()
 
 
 gridCord n = [(x,y) | x <- [0..n-1], y <- [0..n-1]]
 
-computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 +y * sz, sz)
+computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 + y * sz, sz)
 sqr (x, y, s) = rect (x, y, s, s)
 
 -- Returns the square co-ordiantes of the click
