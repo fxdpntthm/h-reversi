@@ -10,6 +10,8 @@ import           Debug.Trace
 import           Disc
 import           Graphics.Blank
 import           Grid
+
+
 main :: IO ()
 main = do
   boardV <- newTVarIO Map.empty
@@ -82,23 +84,27 @@ forever :: TVar Board -> DeviceContext -> IO ()
 forever boardV context = do
         forkIO $ viewer boardV context
         play boardV context White
+
 -- | It is a valid move if
 -- 1) The current pos is empty
 -- 2) There is an adjacent square with opposite colored disc
 -- 3) placing the disc creates a sandwich
 isValidMove :: Cord -> Map Cord Disc -> Disc -> Bool
 isValidMove pos board turn = isEmptySquare pos board
-  && isAdjacentSquareOpposite pos board turn
+  && areAdjacentSquareOpposite pos board turn
 
 -- | Condition 1) in @isValidMove@
 isEmptySquare :: Cord -> Map Cord Disc -> Bool
 isEmptySquare pos board = (Map.lookup pos board) == Nothing
 
 -- | Condition 2) in @isValidMove@
-isAdjacentSquareOpposite :: Cord -> Map Cord Disc -> Disc -> Bool
-isAdjacentSquareOpposite pos board turn = not . null $
+areAdjacentSquareOpposite :: Cord -> Map Cord Disc -> Disc -> Bool
+areAdjacentSquareOpposite pos board turn = not . null $ adjacentOppositeSquares pos board turn
+
+adjacentOppositeSquares :: Cord -> Map Cord Disc -> Disc -> [Maybe Disc]
+adjacentOppositeSquares  pos board turn =
   filter (\e -> e /= Nothing && (e == (Just $ swap turn)))
-  $ fmap ((flip Map.lookup) sampleBoard)
+  $ fmap ((flip Map.lookup) board)
   $ adjacent pos
 
 -- | condition 3) in @isValidMove@
@@ -106,23 +112,31 @@ isAdjacentSquareOpposite pos board turn = not . null $
 -- For each such disc get the last disc
 -- if last disc is of same color return True
 -- else return False
-createsSandwitch :: Cord -> Map Cord Disc -> Disc -> Bool
-createsSandwitch = undefined
 
+sandwitchs :: Cord -> Map Cord Disc -> Disc -> Bool
+sandwitchs = undefined
+  -- adjacentOppositeSquares pos board turn
 
-getLastDisc :: Cord -> Direction -> Map Cord Disc -> Disc -> Maybe (Cord, Disc)
-getLastDisc pos dir board disc =
+getLastDisc :: Cord -> Direction -> Map Cord Disc -> Maybe (Cord, Disc)
+getLastDisc pos dir board =
   -- fix the case for null list, singleton list
   -- z's first element is the input Coord that needs to be ignored
   -- while calculating the last element
-  (pure last) <*> z
+  safeLast =<< (pure tail) <*> z
   where
     -- get the series of all the coordinates in the given direction
-    l = (Just pos) : scanl (\c _ -> c >>= moveInDirection N) (Just pos >>= moveInDirection N) l
+    l = (Just pos)
+        : scanl (\c _ -> c >>= moveInDirection dir)
+                (Just pos >>= moveInDirection dir) l
     md = ((flip Map.lookup) sampleBoard =<<) <$> l
     mls = sequence $ takeWhile (/= Nothing) l
     mmds = sequence $ takeWhile (/= Nothing) md
     z = zip <$> mls <*> mmds
+
+safeLast :: [a] -> Maybe a
+safeLast []     = Nothing
+safeLast (x:[]) = Just x
+safeLast (x:xs) = safeLast xs
 
 -- | Gives the next co-ordinate in the given direction
 moveInDirection :: Direction -> Cord -> Maybe Cord

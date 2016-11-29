@@ -28,7 +28,7 @@ type Board = Map Cord Disc
 -- | Orientation of the line
 -- whether it is North, south east, west, south-east, etc
 data Direction = N | NE | E | SE | S | SW | W | NW
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Enum)
 
 grid w h = do
         let sz = min w h
@@ -81,3 +81,4 @@ direction (nc_x, nc_y) (oc_x, oc_y)
   | (nc_x == oc_x) && (nc_y < oc_y) = S
   | (nc_x > oc_x) && (nc_y < oc_y) = SE
   | (nc_x > oc_x) && (nc_y == oc_y) = E
+
