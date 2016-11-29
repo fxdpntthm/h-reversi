@@ -9,6 +9,7 @@ import           Data.Text           hiding (chunksOf)
 import           Debug.Trace
 import           Disc
 import           Graphics.Blank
+
 -- | Coordinate system goes from -4 to 3
 type Cord = (Int, Int)
 minX :: Int
@@ -27,7 +28,8 @@ type Board = Map Cord Disc
 
 -- | Orientation of the line
 -- whether it is North, south east, west, south-east, etc
-data Direction = N | NE | E | SE | S | SW | W | NW
+-- The order is important as it matches with the adjacent square list
+data Direction = NW | N | NE | E | SE | S | SW | W
   deriving (Show, Eq, Enum)
 
 grid w h = do
@@ -51,7 +53,7 @@ gridCord n = [(x,y) | x <- [0..n-1], y <- [0..n-1]]
 computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 + y * sz, sz)
 sqr (x, y, s) = rect (x, y, s, s)
 
--- Returns the square co-ordiantes of the click
+-- | Returns the square co-ordiantes of the click
 pointToSq :: (Double, Double)  -> Double -> Double -> Maybe Cord
 pointToSq (x,y) w h = validate $
   do x' <- Just $ round $ ((x - w / 2) / sz) * 10
@@ -59,13 +61,13 @@ pointToSq (x,y) w h = validate $
      return (x', y')
   where sz = min w h
 
--- returns a Nothing if click is out of range
+-- | validate if the click in inside the board
 validate :: Maybe Cord -> Maybe Cord
 validate c@(Just (x , y)) = if (x > maxX || x < minX) || (y > maxY || y < minY)
   then Nothing else c
 validate Nothing = Nothing
 
-
+-- | return the adjacent co-ordinates starting from NE clockwise
 adjacent :: Cord -> [Cord]
 adjacent (x, y) = Prelude.filter (\(a,b) -> a >= minX && a <= maxX
                                    && b >= minY && b <= maxY && (a,b) /= (x,y))

@@ -92,6 +92,7 @@ forever boardV context = do
 isValidMove :: Cord -> Map Cord Disc -> Disc -> Bool
 isValidMove pos board turn = isEmptySquare pos board
   && areAdjacentSquareOpposite pos board turn
+  && sandwiches pos board turn
 
 -- | Condition 1) in @isValidMove@
 isEmptySquare :: Cord -> Map Cord Disc -> Bool
@@ -109,34 +110,57 @@ adjacentOppositeSquares  pos board turn =
 
 -- | condition 3) in @isValidMove@
 -- Select all adjacent squares that have opposite disc
--- For each such disc get the last disc
--- if last disc is of same color return True
+-- For each of those discs get first disk of same color in appropriate direction
+-- if any of such discs exist return True
 -- else return False
+sandwiches :: Cord -> Map Cord Disc -> Disc -> Bool
+sandwiches pos board turn = not . null $ filter (/=Nothing) fsds
+  where
+    ds = (toEnum <$> [0..7::Int])::[Direction]
+    l = \d -> moveInDirection d pos
+    ps = zip ds (l <$> ds)
+    vps = filter (\(a, Just b) -> (Map.lookup b board /= Just turn))
+          $ filter (\(a, b) -> (b /= Nothing))
+          $ (\(a, b) -> (a, validate b)) <$> ps
+    sds = \(d, (Just p)) -> getFirstSameDisc p d board turn
+    fsds = sds <$> vps
 
-sandwitchs :: Cord -> Map Cord Disc -> Disc -> Bool
-sandwitchs = undefined
   -- adjacentOppositeSquares pos board turn
 
-getLastDisc :: Cord -> Direction -> Map Cord Disc -> Maybe (Cord, Disc)
-getLastDisc pos dir board =
-  -- fix the case for null list, singleton list
-  -- z's first element is the input Coord that needs to be ignored
-  -- while calculating the last element
-  safeLast =<< (pure tail) <*> z
+-- | returns the co-ordinate of the first disc of the same color
+-- that appears after 1 or more opposite colored discs
+getFirstSameDisc :: Cord -> Direction -> Map Cord Disc -> Disc -> Maybe (Cord, Disc)
+getFirstSameDisc pos dir board turn = collapse $ head z
+  -- safeLast =<< (pure tail) <*> z
   where
     -- get the series of all the coordinates in the given direction
     l = (Just pos)
         : scanl (\c _ -> c >>= moveInDirection dir)
                 (Just pos >>= moveInDirection dir) l
-    md = ((flip Map.lookup) sampleBoard =<<) <$> l
-    mls = sequence $ takeWhile (/= Nothing) l
-    mmds = sequence $ takeWhile (/= Nothing) md
-    z = zip <$> mls <*> mmds
+    md = ((flip Map.lookup) board =<<) <$> l
+    --mls = sequence $ takeWhile (/= Nothing) l
+    --mmds = sequence $ takeWhile (/= Just turn) md
+    z =  dropWhile (\(a,b) -> (b == (Just $ swap turn)))
+      $ safeTail
+      $ zip l md
+
+collapse :: (Maybe a, Maybe b) -> Maybe (a,b)
+-- collapse = undefined
+collapse ((Just x), (Just y)) = Just (x, y)
+collapse _                    = Nothing
 
 safeLast :: [a] -> Maybe a
 safeLast []     = Nothing
 safeLast (x:[]) = Just x
 safeLast (x:xs) = safeLast xs
+
+safeTail :: [a] -> [a]
+safeTail []     = []
+safeTail (x:xs) = xs
+
+safeHead :: [a] -> Maybe a
+safeHead []     = Nothing
+safeHead (x:xs) = Just x
 
 -- | Gives the next co-ordinate in the given direction
 moveInDirection :: Direction -> Cord -> Maybe Cord
@@ -149,7 +173,7 @@ moveInDirection SW (x,y) = validate $ return (x-1,y+1)
 moveInDirection W (x,y)  = validate $ return (x-1,y)
 moveInDirection NW (x,y) = validate $ return (x-1,y-1)
 
-
+-- TODO comment this out after testing
 sampleBoard :: Map Cord Disc
 sampleBoard = fromList [((-1,-1), Black),
                          ((-1,0), White),
