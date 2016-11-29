@@ -18,6 +18,10 @@ cabal-version:       >=1.10
 
 executable h-reversi
   main-is:             Main.hs
+  ghc-options: 
+        -O3
+        -threaded
+        -rtsopts
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.9 && <4.10

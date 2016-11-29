@@ -31,7 +31,7 @@ grid w h = do
 
 gridCord n = [(x,y) | x <- [0..n-1], y <- [0..n-1]]
 
-computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 +y*sz, sz)
+computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 +y * sz, sz)
 sqr (x, y, s) = rect (x, y, s, s)
 
 -- Returns the square co-ordiantes of the click

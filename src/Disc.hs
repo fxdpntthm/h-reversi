@@ -6,9 +6,9 @@ import           Graphics.Blank
 
 data Disc = White | Black deriving (Show, Eq, Ord)
 
-flip :: Disc -> Disc
-flip White = Black
-flip Black = White
+swap :: Disc -> Disc
+swap White = Black
+swap Black = White
 
 drawDisc :: Double -> Disc -> Canvas ()
 drawDisc radius disc = do
