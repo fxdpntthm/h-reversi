@@ -12,7 +12,8 @@ $ cabal install --dependencies-only
 
 ### Run
 ```
-$ ./.cabal-sandbox/bin/h-reversi
+$ 
+$ /usr/local/bin/cabal clean && /usr/local/bin/cabal configure && /usr/local/bin/cabal install && ./.cabal-sandbox/bin/h-reversi
 ```
 
 ### browser
