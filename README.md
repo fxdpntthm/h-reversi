@@ -20,3 +20,6 @@ $ /usr/local/bin/cabal clean && /usr/local/bin/cabal configure && /usr/local/bin
 ```
 http://localhost:3000
 ```
+
+### How to play
+[Reversi wiki](https://en.wikipedia.org/wiki/Reversi)

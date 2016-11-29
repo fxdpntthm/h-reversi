@@ -90,18 +90,54 @@ isValidMove :: Cord -> Map Cord Disc -> Disc -> Bool
 isValidMove pos board turn = isEmptySquare pos board
   && isAdjacentSquareOpposite pos board turn
 
+-- | Condition 1) in @isValidMove@
+isEmptySquare :: Cord -> Map Cord Disc -> Bool
+isEmptySquare pos board = (Map.lookup pos board) == Nothing
+
+-- | Condition 2) in @isValidMove@
 isAdjacentSquareOpposite :: Cord -> Map Cord Disc -> Disc -> Bool
 isAdjacentSquareOpposite pos board turn = not . null $
   filter (\e -> e /= Nothing && (e == (Just $ swap turn)))
   $ fmap ((flip Map.lookup) sampleBoard)
   $ adjacent pos
 
-isEmptySquare :: Cord -> Map Cord Disc -> Bool
-isEmptySquare pos board = (Map.lookup pos board) == Nothing
+-- | condition 3) in @isValidMove@
+-- Select all adjacent squares that have opposite disc
+-- For each such disc get the last disc
+-- if last disc is of same color return True
+-- else return False
+createsSandwitch :: Cord -> Map Cord Disc -> Disc -> Bool
+createsSandwitch = undefined
+
+
+getLastDisc :: Cord -> Direction -> Map Cord Disc -> Disc -> Maybe (Cord, Disc)
+getLastDisc pos dir board disc =
+  -- fix the case for null list, singleton list
+  -- z's first element is the input Coord that needs to be ignored
+  -- while calculating the last element
+  (pure last) <*> z
+  where
+    -- get the series of all the coordinates in the given direction
+    l = (Just pos) : scanl (\c _ -> c >>= moveInDirection N) (Just pos >>= moveInDirection N) l
+    md = ((flip Map.lookup) sampleBoard =<<) <$> l
+    mls = sequence $ takeWhile (/= Nothing) l
+    mmds = sequence $ takeWhile (/= Nothing) md
+    z = zip <$> mls <*> mmds
+
+-- | Gives the next co-ordinate in the given direction
+moveInDirection :: Direction -> Cord -> Maybe Cord
+moveInDirection N (x,y)  = validate $ return (x, y-1)
+moveInDirection NE (x,y) = validate $ return (x+1,y-1)
+moveInDirection E (x,y)  = validate $ return (x+1,y)
+moveInDirection SE (x,y) = validate $ return (x+1,y+1)
+moveInDirection S (x,y)  = validate $ return (x,y+1)
+moveInDirection SW (x,y) = validate $ return (x-1,y+1)
+moveInDirection W (x,y)  = validate $ return (x-1,y)
+moveInDirection NW (x,y) = validate $ return (x-1,y-1)
 
 
 sampleBoard :: Map Cord Disc
 sampleBoard = fromList [((-1,-1), Black),
-                              ((-1,0), White),
-                              ((0,0), Black),
-                              ((0,-1), White)]
+                         ((-1,0), White),
+                         ((0,0), Black),
+                         ((0,-1), White)]
