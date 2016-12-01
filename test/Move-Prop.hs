@@ -31,19 +31,6 @@ sampleBoard'' = fromList [((-2,-2),Black),((-2,-1),Black),
                           ((0,0),Black),((0,1),White),
                           ((1,1),White),((2,1),White)]
 
-allValidMoves :: Board -> Disc -> [Cord]
-allValidMoves board turn = filter iv cs
-  where
-    cs = emptyCords board
-    iv c =  isValidMove c board turn
-
-
-emptyCords :: Board -> [Cord]
-emptyCords board = Set.toList $ Set.difference bs es
-  where
-    bs = Set.fromList ((,) <$> [minX..maxX] <*> [minY..maxY])
-    es = Set.fromList (fst <$> Map.toList board)
-
 
 validMoveGen :: Board -> Disc -> Gen Cord
 validMoveGen board turn = elements $ allValidMoves board turn
