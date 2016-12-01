@@ -105,14 +105,11 @@ sampleBoard' = fromList [((-1,-1),Black),
                          ((1,1),Black)]
 
 sampleBoard'' :: Map Cord Disc
-sampleBoard'' = fromList [((-4,1),White),((-3,0),White),
-                          ((-3,1),White),((-2,-2),Black),
-                          ((-2,-1),White),((-2,0),Black),
-                          ((-1,-3),Black),((-1,-2),White),
-                          ((-1,-1),Black),((-1,0),Black),
-                          ((0,-4),Black),((0,-3),Black),
-                          ((0,-2),Black),((0,-1),Black),
-                          ((0,0),Black)]
+sampleBoard'' = fromList [((-2,-2),Black),((-2,-1),Black),
+                          ((-2,0),Black),((-1,-1),Black),
+                          ((-1,0),Black),((0,-1),White),
+                          ((0,0),Black),((0,1),White),
+                          ((1,1),White),((2,1),White)]
 {-
 let {pos = (0,1); board = sampleBoard; turn = White}
 let {pos = (2,1); board = sampleBoard'; turn = White}

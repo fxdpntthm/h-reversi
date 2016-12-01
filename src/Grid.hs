@@ -65,7 +65,7 @@ pointToSq (x,y) w h = validate $
      return (x', y')
   where sz = min w h
 
--- | validate if the coordinate in inside the board
+-- | validate if the coordinate is inside the board
 validate :: Maybe Cord -> Maybe Cord
 validate c@(Just (x , y)) = if (x > maxX || x < minX) || (y > maxY || y < minY)
   then Nothing else c
@@ -137,7 +137,7 @@ allFirstSameDiscs pos board turn = sds <$> vps
   where
     l d = move d pos
     ps = zip allDirections (l <$> allDirections)
-    vps = filter (\(a, Just b) -> (isJust $ Map.lookup b board)
+    vps = filter (\(a, Just b) -> isJust (Map.lookup b board)
                  && (Map.lookup b board /= Just turn))
           $ filter (\(a, b) -> isJust b)
           $ second validate <$> ps
@@ -154,7 +154,7 @@ getFirstSameDisc pos dir board turn = collapse $ head z
     -- get the series of all the coordinates in the given direction
     l = line pos dir
     md = (flip Map.lookup board =<<) <$> l
-    z =  dropWhile (\(a,b) -> (b == (Just $ swap turn)) && isNothing b)
+    z =  dropWhile (\(a,b) -> (b == (Just $ swap turn)))
       $ safeTail
       $ zip l md
 
