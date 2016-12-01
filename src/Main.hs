@@ -68,7 +68,7 @@ play boardV context turn = do
   event <- wait context
   --print $ ePageXY event
   let sq = ePageXY event >>= \ (x, y) -> pointToSq (x, y) cw ch
-
+  print sq
   turn' <- atomically $ do
     board <- readTVar boardV
     case sq of
@@ -97,13 +97,12 @@ sampleBoard = fromList [((-1,-1), Black),
                          ((0,-1), White)]
 
 sampleBoard' :: Map Cord Disc
-sampleBoard' = fromList [((-4,1),White),((-3,0),White),
-                         ((-3,1),White),((-2,-2),Black),
-                         ((-2,-1),White),((-2,0),Black),
-                         ((-1,-2),White),((-1,-1),Black),
-                         ((-1,0),Black),((0,-3),White),
-                         ((0,-2),Black),((0,-1),Black),
-                         ((0,0),Black)]
+sampleBoard' = fromList [((-1,-1),Black),
+                         ((-1,0),White),
+                         ((0,-1),White),
+                         ((0,0),Black),
+                         ((0,1),White),
+                         ((1,1),Black)]
 
 sampleBoard'' :: Map Cord Disc
 sampleBoard'' = fromList [((-4,1),White),((-3,0),White),
@@ -116,7 +115,7 @@ sampleBoard'' = fromList [((-4,1),White),((-3,0),White),
                           ((0,0),Black)]
 {-
 let {pos = (0,1); board = sampleBoard; turn = White}
-let {pos = (1,1); board = sampleBoard'; turn = White}
+let {pos = (2,1); board = sampleBoard'; turn = White}
 -}
 
 -- TODO tests
