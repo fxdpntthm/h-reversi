@@ -182,4 +182,5 @@ line pos d = l
     l = Just pos : scanl (\c _ -> c >>= move d)
                 (Just pos >>= move d) l
 
+allDirections :: [Direction]
 allDirections = (toEnum <$> [0..7::Int])::[Direction]
