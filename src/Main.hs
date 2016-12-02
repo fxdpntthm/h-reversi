@@ -69,8 +69,7 @@ viewer boardV context turn = do
 endGame :: DeviceContext -> Double -> Double -> Int -> Int -> IO ()
 endGame context cw ch whites blacks = do {
   send context
-    $ do --clearRect( 0,0,cw, ch)
-         font "italic 15pt Calibri"
+    $ do font "italic 15pt Calibri"
          fillText(pack $ "Game Over! || Final Score || White: "
                    ++ show whites ++ " Black: " ++ show blacks
                    ++ " || Winner: "
@@ -89,15 +88,19 @@ play boardV context turn = do
   let whites = length $ filter (\(_,b) -> b == White) $ Map.toList board
   -- check if valid move exist
   let vs = allValidMoves board turn
+  let vs' = allValidMoves board $ swap turn
+
   if null vs
-    then viewer boardV context turn
-    else do { print board
-            ; print $ "waiting for turn: " ++ show turn
-            ; event <- wait context
+    then if null vs' then  viewer boardV context turn
+         else do print $ show turn ++ " cannot play. swapping.."
+                 play boardV context $ swap turn
+    else do print board
+            print $ "waiting for turn: " ++ show turn
+            event <- wait context
             --print $ ePageXY event
-            ; let sq = ePageXY event >>= \ (x, y) -> pointToSq (x, y) cw ch
-            ; print sq
-            ; turn' <- atomically $ do
+            let sq = ePageXY event >>= \ (x, y) -> pointToSq (x, y) cw ch
+            print sq
+            turn' <- atomically $ do
                 boardStates <- readTVar boardV
                 let board = head boardStates
 
@@ -113,7 +116,7 @@ play boardV context turn = do
                                 -- already something here
                                 Just _ ->  return turn
                   Nothing     -> return turn
-            ; play boardV context turn' }
+            play boardV context turn'
 
 forever :: TVar [Board] -> DeviceContext -> Disc -> IO ()
 forever boardV context turn = do
