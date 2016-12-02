@@ -1,5 +1,16 @@
 module Util where
 
+minX :: Int
+minX = -4
+
+maxX :: Int
+maxX = 3
+
+minY :: Int
+minY = -4
+
+maxY :: Int
+maxY = 3
 
 collapse :: (Maybe a, Maybe b) -> Maybe (a,b)
 collapse (Just x, Just y) = Just (x, y)

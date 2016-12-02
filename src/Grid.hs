@@ -8,6 +8,7 @@ import           Data.List.Split
 import           Data.Map            (Map, fromList)
 import qualified Data.Map            as Map
 import           Data.Maybe
+import qualified Data.Set            as Set
 import qualified Data.Text           as T
 import           Debug.Trace
 import           Disc
@@ -16,17 +17,6 @@ import           Util
 
 -- | Coordinate system goes from -4 to 3
 type Cord = (Int, Int)
-minX :: Int
-minX = -4
-
-maxX :: Int
-maxX = 3
-
-minY :: Int
-minY = -4
-
-maxY :: Int
-maxY = 3
 
 type Board = Map Cord Disc
 
@@ -184,3 +174,17 @@ line pos d = l
 
 allDirections :: [Direction]
 allDirections = (toEnum <$> [0..7::Int])::[Direction]
+
+-- | get all valid moves
+allValidMoves :: Board -> Disc -> [Cord]
+allValidMoves board turn = filter iv cs
+  where
+    cs = emptyCords board
+    iv c =  isValidMove c board turn
+
+
+emptyCords :: Board -> [Cord]
+emptyCords board = Set.toList $ Set.difference bs es
+  where
+    bs = Set.fromList ((,) <$> [minX..maxX] <*> [minY..maxY])
+    es = Set.fromList (fst <$> Map.toList board)

@@ -6,7 +6,6 @@ import qualified Data.Set        as Set
 import           Disc
 import           Grid
 import           Test.QuickCheck
-
 main :: IO ()
 main = putStrLn "This test always fails!"
 
@@ -32,6 +31,33 @@ sampleBoard'' = fromList [((-2,-2),Black),((-2,-1),Black),
                           ((1,1),White),((2,1),White)]
 
 
+endGame :: Board
+endGame = fromList [((-4,-4),White),((-4,-3),White),((-4,-2),White),
+                    ((-4,-1),White),((-4,0),White),((-4,1),White),
+                    ((-4,2),White),((-4,3),White),((-3,-4),White),
+                    ((-3,-3),White),((-3,-2),Black),((-3,-1),Black),
+                    ((-3,0),Black),((-3,1),Black),((-3,2),Black),
+                    ((-3,3),White),((-2,-4),White),((-2,-3),Black),
+                    ((-2,-2),White),((-2,-1),Black),((-2,0),Black),
+                    ((-2,1),Black),((-2,2),Black),((-2,3),White),
+                    ((-1,-4),White),((-1,-3),Black),((-1,-2),Black),
+                    ((-1,-1),White),((-1,0),Black),((-1,1),White),
+                    ((-1,2),Black),((-1,3),White),((0,-4),White),
+                    ((0,-3),White),((0,-2),Black),((0,-1),Black),
+                    ((0,0),White),((0,1),Black),((0,2),White),
+                    ((0,3),White),((1,-4),White),((1,-3),White),
+                    ((1,-2),Black),((1,-1),Black),((1,0),White),
+                    ((1,1),Black),((1,2),White),((1,3),White),
+                    ((2,-4),White),((2,-3),White),((2,-2),White),
+                    ((2,-1),White),((2,0),White),((2,1),White),
+                    ((2,2),Black),((2,3),White),((3,-4),Black),
+                    ((3,-3),Black),((3,-2),Black),((3,-1),Black),
+                    ((3,0),White),((3,1),Black),((3,2),Black)]
+
+endGame' :: Board
+endGame' = fromList [((-4,-4),White),((-4,-3),White),((-4,-2),White),((-4,-1),White),((-4,0),White),((-4,1),White),((-4,2),White),((-3,-4),Black),((-3,-3),Black),((-3,-2),Black),((-3,-1),White),((-3,0),Black),((-3,1),White),((-3,2),White),((-3,3),Black),((-2,-4),Black),((-2,-3),Black),((-2,-2),White),((-2,-1),Black),((-2,0),White),((-2,1),Black),((-2,2),White),((-2,3),Black),((-1,-4),Black),((-1,-3),White),((-1,-2),Black),((-1,-1),Black),((-1,0),White),((-1,1),Black),((-1,2),White),((-1,3),Black),((0,-4),Black),((0,-3),Black),((0,-2),White),((0,-1),Black),((0,0),White),((0,1),White),((0,2),Black),((0,3),Black),((1,-4),Black),((1,-3),White),((1,-2),Black),((1,-1),Black),((1,0),Black),((1,1),Black),((1,2),White),((1,3),Black),((2,-4),Black),((2,-3),Black),((2,-2),White),((2,-1),White),((2,0),Black),((2,1),Black),((2,2),Black),((2,3),Black),((3,-4),Black),((3,-3),Black),((3,-2),Black),((3,-1),Black),((3,0),Black),((3,1),Black),((3,2),Black),((3,3),Black)]
+
+
 validMoveGen :: Board -> Disc -> Gen Cord
 validMoveGen board turn = elements $ allValidMoves board turn
 -- allValidMoves should be non-empty
@@ -39,10 +65,6 @@ validMoveGen board turn = elements $ allValidMoves board turn
 -- boardG :: Board -> Disc ->  Board
 -- boardG board turn = apply () sampleBoard turn
 --  where
-
--- | emulates the game
-apply :: Cord -> Board -> Disc -> Board
-apply pos board turn = updateBoard pos turn board
 
 -- 1) property --> after every move, total number of discs is increased only by one
 prop_discInc pos =
