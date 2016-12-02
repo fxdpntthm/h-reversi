@@ -129,7 +129,7 @@ allFirstSameDiscs pos board turn = sds <$> vps
     ps = zip allDirections (l <$> allDirections)
     vps = filter (\(a, Just b) -> isJust (Map.lookup b board)
                  && (Map.lookup b board /= Just turn))
-          $ filter (\(a, b) -> isJust b)
+          $ filter (isJust . snd)
           $ second validate <$> ps
     sds (d, Just p) = getFirstSameDisc p d board turn
     -- z = zip3 allDirections

@@ -43,8 +43,8 @@ viewer boardV context = do
   let (turn, board) = head boardStates
 
   --print boardStates
-  let blacks = length $ filter (\(_,b) -> isBlack b) $ Map.toList board
-  let whites = length $ filter (\(_,b) -> isWhite b) $ Map.toList board
+  let blacks = length $ filter (isBlack . snd) $ Map.toList board
+  let whites = length $ filter (isWhite . snd) $ Map.toList board
   print  (length $ Map.toList board, blacks, whites)
   -- check if valid move exist
   -- TODO Fix this to a proper logic
@@ -56,7 +56,7 @@ viewer boardV context = do
                     -- put on all the discs TODO fix this. The ratios aren't proper
                     drawDiscs sz board
                     -- print $ (width context, height context)
-                    printTurn context cw ch turn
+                    printTurn context cw ch turn whites blacks
                     save ()
 
   if (not $ null vs)
@@ -66,11 +66,12 @@ viewer boardV context = do
           viewer boardV context
   else endGame context cw ch whites blacks
 
-printTurn :: DeviceContext -> Double -> Double -> Disc -> Canvas ()
-printTurn context cw ch turn =
+printTurn :: DeviceContext -> Double -> Double -> Disc -> Int -> Int -> Canvas ()
+printTurn context cw ch turn whites blacks =
   do clearRect (cw/8, ch*0.95, cw, ch)
      font "italic 15pt Calibri"
-     fillText(pack $ "Turn: " ++ show turn
+     fillText(pack $ "Turn: " ++ show turn ++ " || Score || White: "
+                   ++ show whites ++ " Black: " ++ show blacks
              , cw/8, ch*0.95)
      save ()
 
@@ -82,8 +83,12 @@ endGame context cw ch whites blacks = do
          fillText(pack $ "Game Over! || Final Score || White: "
                    ++ show whites ++ " Black: " ++ show blacks
                    ++ " || Winner: "
-                   ++ (show $ if (whites > blacks) then White else Black)
-                 , cw/5, ch*0.95)
+                   ++ (if whites > blacks
+                       then show White
+                       else if whites == blacks
+                            then "Draw"
+                            else show Black)
+                 , cw/8, ch*0.95)
          save ()
   print "Game Over!"
 
@@ -93,26 +98,27 @@ play boardV context = do
   boardStates <- atomically $ readTVar boardV
   let (turn, board) = head boardStates
 
-  let blacks = length $ filter (\(_, b) -> isBlack b) $ Map.toList board
-  let whites = length $ filter (\(_,b) -> isWhite b) $ Map.toList board
+  let blacks = length $ filter (isBlack . snd) $ Map.toList board
+  let whites = length $ filter (isWhite . snd) $ Map.toList board
   -- check if valid move exist
   let vs = allValidMoves board turn
   let vs' = allValidMoves board $ swap turn
 
   if null vs
-    then if null vs' then  viewer boardV context
-         else do print $ show turn ++ " cannot play. swapping.."
-                 atomically $ do writeTVar boardV
-                                  $ (swap turn, board) : boardStates
-                                 return ()
-                 play boardV context
-    else do print board
-            print $ "waiting for turn: " ++ show turn
-            event <- wait context
-            --print $ ePageXY event
-            let sq = ePageXY event >>= \ (x, y) -> pointToSq (x, y) cw ch
-            print sq
-            turn' <- atomically $ do
+  then if null vs'
+       then  viewer boardV context
+       else do print $ show turn ++ " cannot play. swapping.."
+               atomically $ do writeTVar boardV
+                                   $ (swap turn, board) : boardStates
+                               return ()
+               play boardV context
+  else do print board
+          print $ "waiting for turn: " ++ show turn
+          event <- wait context
+          --print $ ePageXY event
+          let sq = ePageXY event >>= \ (x, y) -> pointToSq (x, y) cw ch
+          print sq
+          turn' <- atomically $ do
                 boardStates <- readTVar boardV
                 let board = snd $ head boardStates
 
@@ -128,7 +134,7 @@ play boardV context = do
                                 -- already something here
                                 Just _ ->  return turn
                   Nothing     -> return turn
-            play boardV context
+          play boardV context
 
 forever :: TVar [(Disc, Board)] -> DeviceContext -> IO ()
 forever boardV context= do
