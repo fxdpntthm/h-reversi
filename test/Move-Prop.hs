@@ -1,10 +1,11 @@
 module Main where
 
-import           Data.Map        (Map, fromList)
+import           Data.Map        (fromList)
 import qualified Data.Map        as Map
-import qualified Data.Set        as Set
-import           Disc
-import           Grid
+--import qualified Data.Set        as Set
+import           Data.Set        ()
+import           Game.Disc
+import           Game.Grid
 import           Test.QuickCheck
 main :: IO ()
 main = putStrLn "This test always fails!"
@@ -60,6 +61,8 @@ endGame' = fromList [((-4,-4),White),((-4,-3),White),((-4,-2),White),((-4,-1),Wh
 
 validMoveGen :: Board -> Disc -> Gen Cord
 validMoveGen board turn = elements $ allValidMoves board turn
+
+
 -- allValidMoves should be non-empty
 
 -- boardG :: Board -> Disc ->  Board
@@ -67,13 +70,9 @@ validMoveGen board turn = elements $ allValidMoves board turn
 --  where
 
 -- 1) property --> after every move, total number of discs is increased only by one
+prop_discInc :: Cord -> Bool
 prop_discInc pos =
   1 + (length $ Map.toList sampleBoard) == length (Map.toList $ updateBoard pos White sampleBoard)
-
-{-
-let {pos = (0,1); board = sampleBoard; turn = White}
-let {pos = (2,1); board = sampleBoard'; turn = White}
--}
 
 
 
