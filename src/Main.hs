@@ -28,9 +28,9 @@ startData :: TVar [(Disc, Board)] -> IO ()
 startData boardV = atomically $ do
   board <- readTVar boardV
   writeTVar boardV [(White, fromList [((-1,-1), Black),
-                                      ((-1,0), White),
-                                      ((0,0), Black),
-                                      ((0,-1), White)])]
+                                     ((-1,0), White),
+                                     ((0,0), Black),
+                                     ((0,-1), White)])]
 
 
 viewer :: TVar [(Disc, Board)] -> DeviceContext ->IO ()
@@ -136,3 +136,4 @@ forever :: TVar [(Disc, Board)] -> DeviceContext -> IO ()
 forever boardV context= do
         forkIO $ viewer boardV context
         play boardV context
+
