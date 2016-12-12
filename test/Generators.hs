@@ -5,7 +5,7 @@ import           Game.Disc
 import           Game.Grid
 import           Test.QuickCheck
 
-
+-- | Generates an arbitrary valid game state
 arbitraryGameState :: Gen (Disc, Board, Cord)
 arbitraryGameState = do (t, b) <- arbitraryValidBoard
                         vm <- validMoveGen b t
