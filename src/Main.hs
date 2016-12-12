@@ -11,10 +11,10 @@ import qualified Data.Map                    as Map
 import qualified Data.Set                    as Set
 import           Data.Text                   (pack)
 import           Debug.Trace
-import           Disc
+import           Game.Disc
+import           Game.Grid
+import           Game.Util
 import           Graphics.Blank
-import           Grid
-import           Util
 main :: IO ()
 main = do
   boardV <- newTVarIO []
@@ -32,9 +32,6 @@ startData boardV = atomically $ do
                                       ((0,0), Black),
                                       ((0,-1), White)])]
 
-endData :: [(Disc, Board)]
-endData  = [(Black, fromList [((-4,-4),Black),((-4,-3),Black),((-4,-2),Black),((-4,-1),Black),((-4,0),Black),((-4,1),White),((-3,-4),White),((-3,-3),White),((-3,-2),White),((-3,-1),Black),((-3,0),White),((-3,1),White),((-3,2),White),((-3,3),Black),((-2,-4),White),((-2,-3),White),((-2,-2),Black),((-2,-1),White),((-2,0),Black),((-2,1),White),((-2,2),Black),((-2,3),Black),((-1,-4),White),((-1,-3),Black),((-1,-2),White),((-1,-1),Black),((-1,0),White),((-1,1),Black),((-1,2),White),((-1,3),Black),((0,-4),White),((0,-3),White),((0,-2),Black),((0,-1),Black),((0,0),Black),((0,1),White),((0,2),Black),((0,3),Black),((1,-4),White),((1,-3),Black),((1,-2),White),((1,-1),Black),((1,0),White),((1,1),Black),((1,2),White),((1,3),Black),((2,-4),White),((2,-3),Black),((2,-2),Black),((2,-1),White),((2,0),Black),((2,1),White),((2,2),White),((2,3),Black),((3,-4),White),((3,-3),Black),((3,-2),Black),((3,-1),Black),((3,0),Black),((3,1),Black),((3,2),Black),((3,3),Black)])]
-
 
 viewer :: TVar [(Disc, Board)] -> DeviceContext ->IO ()
 viewer boardV context = do
@@ -46,20 +43,19 @@ viewer boardV context = do
   let blacks = length $ filter (isBlack . snd) $ Map.toList board
   let whites = length $ filter (isWhite . snd) $ Map.toList board
   print  (length $ Map.toList board, blacks, whites)
+
   -- check if valid move exist
-  -- TODO Fix this to a proper logic
   let vs = allValidMoves board turn
   let vs' = allValidMoves board $ swap turn
   send context $ do clearRect (0,0, cw, ch)
                     beginPath()
                     grid (width context) (height context)
-                    -- put on all the discs TODO fix this. The ratios aren't proper
                     drawDiscs sz board
                     -- print $ (width context, height context)
                     printTurn context cw ch turn whites blacks
                     save ()
 
-  if (not $ null vs)
+  if not $ null vs
   then do atomically $ do boardStates' <- readTVar boardV
                           let board' = snd $ head boardStates'
                           when (board == board') retry

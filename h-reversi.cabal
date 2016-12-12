@@ -38,8 +38,10 @@ executable h-reversi
 
 library
   Exposed-modules:     Main
-                     , Grid
-                     , Disc
+                     , Game.Util
+                     , Game.Grid
+                     , Game.Disc
+
   default-language:    Haskell2010
   hs-source-dirs:      src
   build-depends:       QuickCheck >= 2.9.2

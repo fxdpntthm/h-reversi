@@ -1,4 +1,4 @@
-module Util where
+module Game.Util where
 
 minX :: Int
 minX = -4

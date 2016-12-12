@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Grid where
+module Game.Grid where
 
 import           Control.Applicative
 import           Control.Arrow
@@ -11,9 +11,9 @@ import           Data.Maybe
 import qualified Data.Set            as Set
 import qualified Data.Text           as T
 import           Debug.Trace
-import           Disc
+import           Game.Disc
+import           Game.Util
 import           Graphics.Blank
-import           Util
 
 -- | Coordinate system goes from -4 to 3
 type Cord = (Int, Int)
@@ -42,7 +42,7 @@ grid w h = do
         stroke()
         restore()
 
-gridCord n = [(x,y) | x <- [0..n-1], y <- [0..n-1]]
+gridCord n = (,) <$> [0..n-1] <*> [0..n-1]
 
 computeSquare (x0, y0) sz (x, y) = sqr (x0 + x*sz, y0 + y * sz, sz)
 sqr (x, y, s) = rect (x, y, s, s)

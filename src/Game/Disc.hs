@@ -1,10 +1,10 @@
-module Disc where
+module Game.Disc where
 
 import           Data.Map
 import qualified Data.Map       as Map
 import           Data.Text
+import           Game.Util
 import           Graphics.Blank
-import           Util
 data Disc = White | Black deriving (Show, Eq, Ord)
 
 -- | Swaps the turn
