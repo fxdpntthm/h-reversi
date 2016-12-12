@@ -10,9 +10,16 @@ $ cabal sandbox init
 $ cabal install --dependencies-only
 ```
 
+### Test
+```
+$ cabal configure --enable-tests
+$ cabal install --enable-tests
+$ cabal build && cabal test
+```
+
 ### Run
 ```
-$ /usr/local/bin/cabal clean && /usr/local/bin/cabal configure && /usr/local/bin/cabal install && ./.cabal-sandbox/bin/h-reversi
+$ cabal clean && cabal configure && cabal install && ./.cabal-sandbox/bin/h-reversi
 ```
 
 ### browser
