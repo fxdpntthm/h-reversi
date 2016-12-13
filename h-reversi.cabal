@@ -66,3 +66,7 @@ test-suite h-reversi-properties
   hs-source-dirs:      test
   default-language:    Haskell2010
   ghc-options:         -threaded -Wall
+
+source-repository head
+  type:     git
+  location: https://github.com/apoorvingle/h-reversi.git
