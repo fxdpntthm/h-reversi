@@ -1,46 +1,53 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Generators where
 
 import           Data.Map        (fromList)
+import qualified Data.Tuple      as T
 import           Game.Disc
 import           Game.Grid
 import           Test.QuickCheck
 
+newtype GameState = GS (Disc, Board, Cord) deriving (Show, Eq)
+
 -- | Generates an arbitrary valid game state
-arbitraryGameState :: Gen (Disc, Board, Cord)
-arbitraryGameState = do (t, b) <- arbitraryValidBoard
-                        vm <- validMoveGen b t
-                        return (t, b, vm)
+instance Arbitrary GameState where
+  arbitrary = do bs@(BS (t, b)) <- (arbitrary::Gen BoardState)
+                 vm <- validMoveGen bs
+                 return $ GS (t, b, vm)
 
-stepGen :: Board -> Disc -> Gen Board
-stepGen board turn = do vm <- validMoveGen board turn
-                        return $ updateBoard vm turn board
+-- | Generates an arbitrary valid boad state starting from start point
+newtype BoardState = BS (Disc, Board) deriving (Show, Eq)
 
-boardGen :: Int -> Board -> Disc -> Gen (Disc, Board)
-boardGen 0 board turn = return (turn, board)
-boardGen n board turn = do nb <- stepGen board turn
-                           boardGen (n-1) nb (swap turn)
+instance Arbitrary BoardState where
+  arbitrary = do
+    n <- arbitrary
+    boardGen n (BS (White, sampleBoard))
 
-arbitraryValidBoard :: Gen (Disc, Board)
-arbitraryValidBoard = do t <- choose (0,30)
-                         boardGen t sampleBoard White
+-- | Emulate the steps between 0 and 30 moves
+newtype Steps = Step Int deriving (Show, Eq, Enum)
+
+instance Arbitrary Steps where
+  arbitrary = Step <$> choose (0, 30)
+
+boardGen :: Steps -> BoardState -> Gen BoardState
+boardGen (Step 0) bs = return $ bs
+boardGen st bs@(BS (turn, ob)) =
+  do vm <- validMoveGen bs
+     let nb = updateBoard vm turn ob
+     boardGen (pred st) (BS ((swap turn), nb))
 
 
-validMoveGen :: Board -> Disc -> Gen Cord
-validMoveGen board turn = elements $ allValidMoves board turn
+-- | This is an unsafe call as elemens can throw an exception if allValidMoves
+-- is empty list
+validMoveGen :: BoardState -> Gen Cord
+validMoveGen (BS bs) = elements $ uncurry allValidMoves (T.swap bs)
 
 sampleBoard :: Board
 sampleBoard = fromList [((-1,-1), Black),
                          ((-1,0), White),
                          ((0,0), Black),
                          ((0,-1), White)]
-
--- sampleBoard' :: Board
--- sampleBoard' = fromList [((-1,-1),Black),
---                          ((-1,0),White),
---                          ((0,-1),White),
---                          ((0,0),Black),
---                          ((0,1),White),
---                          ((1,1),Black)]
 
 -- sampleBoard'' :: Board
 -- sampleBoard'' = fromList [((-2,-2),Black),((-2,-1),Black),
