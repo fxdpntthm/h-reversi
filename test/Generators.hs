@@ -28,7 +28,7 @@ instance Arbitrary BoardState where
 newtype Steps = Step Int deriving (Show, Eq, Enum)
 
 instance Arbitrary Steps where
-  arbitrary = Step <$> choose (0, 30)
+  arbitrary = Step <$> choose (0, 20)
 
 boardGen :: Steps -> BoardState -> Gen BoardState
 boardGen (Step 0) bs = return $ bs
