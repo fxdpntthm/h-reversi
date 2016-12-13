@@ -32,3 +32,7 @@ http://localhost:3000
 
 ### How to play
 [Reversi wiki](https://en.wikipedia.org/wiki/Reversi)
+
+### Screenshots
+![Game screenshot](images/screenshot.jpeg)
+![End Game screenshot](images/screenshot-endgame.jpeg)
