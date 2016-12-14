@@ -355,3 +355,5 @@ local.properties
 _site/
 .sass-cache/
 .jekyll-metadata
+
+build-docs.*/
