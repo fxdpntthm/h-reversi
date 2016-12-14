@@ -1,4 +1,0 @@
-language: c
-sudo: false
-
-ghc: 8.0
