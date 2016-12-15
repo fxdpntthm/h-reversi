@@ -34,5 +34,7 @@ http://localhost:3000
 [Reversi wiki](https://en.wikipedia.org/wiki/Reversi)
 
 ### Screenshots
-![Game screenshot](images/screenshot.jpeg)
-![End Game screenshot](images/screenshot-endgame.jpeg)
+| Game screenshot    | End Game screenshot    |
+| ------------------ |:----------------------:|
+| ![Game screenshot](images/screenshot.jpeg)  | ![End Game screenshot](images/screenshot-endgame.jpeg)  |
+
