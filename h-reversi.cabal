@@ -5,9 +5,9 @@ name:                h-reversi
 version:             0.1.0.2
 synopsis:            Reversi game in haskell/blank-canvas
 
-description:         @h-reversi@ is build using using html5/blank-canvas
+description:         @h-reversi@ uses html5/blank-canvas underneath
                      .
-                     <<https://github.com/apoorvingle/h-reversi/blob/master/images/screenshot.jpeg>>
+                     <<https://raw.githubusercontent.com/apoorvingle/h-reversi/master/images/screenshot.jpeg>>
                      .
                      Please visit <https://github.com/apoorvingle/h-reversi h-reversi> for more details
                      .
