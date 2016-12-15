@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                h-reversi
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Reversi game in haskell/blank-canvas
 description:         @h-reversi@ is build using using html5/blank-canvas
                      @
@@ -64,7 +64,7 @@ test-suite h-reversi-properties
   build-depends:       QuickCheck >= 2.9 && <= 3.0
                      , base >= 4.8 && < 4.10
                      , containers >= 0.5.7.1 && <= 0.6
-                     , h-reversi == 0.1.0.0
+                     , h-reversi == 0.1.0.1
                      , hspec >= 2.3.2 && <= 2.5
                      , split >= 0.2.3 && <= 0.2.5
                      , text >= 1.2.2.1 && <= 1.3
