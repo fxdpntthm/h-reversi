@@ -5,6 +5,7 @@ import qualified Data.Map       as Map
 import           Data.Text
 import           Game.Util
 import           Graphics.Blank
+
 data Disc = White | Black deriving (Show, Eq, Ord)
 
 -- | Swaps the turn
