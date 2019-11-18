@@ -13,11 +13,8 @@ jobs:
       with:
         ghc-version: '8.8.1'
         cabal-version: '3.0'
-    - name: Install dependencies
-      run: |
-        cabal update
-        cabal install --only-dependencies
     - name: Build
       run: |
+        cabal update
         cabal configure
         cabal build
