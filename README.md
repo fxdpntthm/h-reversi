@@ -1,7 +1,5 @@
 # h-reversi
-Haskell blank canvas reversi game  
-
-[![Build Status](https://travis-ci.org/apoorvingle/h-reversi.svg?branch=master)](https://travis-ci.org/apoorvingle/h-reversi)  
+Haskell blank canvas reversi game   
 
 ### Installation
 
