@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import           Control.Arrow               (second)
 import           Control.Concurrent
 import           Control.Concurrent.STM
 import           Control.Concurrent.STM.TVar
@@ -15,31 +14,36 @@ import           Game.Disc
 import           Game.Grid
 import           Game.Util
 import           Graphics.Blank
+
+type BoardStateTrail = TVar [(Disc, Board)] 
+
+opts = 3000
+
 main :: IO ()
 main = do
   boardV <- newTVarIO []
   -- generate some static data for rendering
   startData boardV
-  print  "starting canvas"
-  blankCanvas 3000 {events = ["mousedown"] }
+  print $ "starting canvas on port: " ++ show (port opts)
+  blankCanvas opts {events = ["mousedown"] }
     $ \context -> forever boardV context
 
-startData :: TVar [(Disc, Board)] -> IO ()
+startData :: BoardStateTrail -> IO ()
 startData boardV = atomically $ do
   board <- readTVar boardV
-  writeTVar boardV [(White, fromList [((-1,-1), Black),
-                                     ((-1,0), White),
-                                     ((0,0), Black),
-                                     ((0,-1), White)])]
+  writeTVar boardV [(White, Map.fromList [((-1, -1), Black),
+                                          ((-1,  0), White),
+                                          ((0,   0), Black),
+                                          ((0,  -1), White)])]
 
 
-viewer :: TVar [(Disc, Board)] -> DeviceContext ->IO ()
-viewer boardV context = do
+viewer :: DeviceContext -> BoardStateTrail -> IO ()
+viewer context boardV = do
   let (cw, ch, sz) = (width context, height context, min cw ch)
   boardStates <- atomically $ readTVar boardV
   let (turn, board) = head boardStates
 
-  --print boardStates
+  -- print boardStates
   let blacks = length $ filter (isBlack . snd) $ Map.toList board
   let whites = length $ filter (isWhite . snd) $ Map.toList board
   print  (length $ Map.toList board, blacks, whites)
@@ -59,7 +63,7 @@ viewer boardV context = do
   then do atomically $ do boardStates' <- readTVar boardV
                           let board' = snd $ head boardStates'
                           when (board == board') retry
-          viewer boardV context
+          viewer context boardV 
   else endGame context cw ch whites blacks
 
 printTurn :: DeviceContext -> Double -> Double -> Disc -> Int -> Int -> Canvas ()
@@ -88,8 +92,8 @@ endGame context cw ch whites blacks = do
          save ()
   print "Game Over!"
 
-play :: TVar [(Disc, Board)] -> DeviceContext -> IO ()
-play boardV context = do
+play :: DeviceContext -> BoardStateTrail  -> IO ()
+play context boardV = do
   let (cw, ch, sz) = (width context, height context, min cw ch)
   boardStates <- atomically $ readTVar boardV
   let (turn, board) = head boardStates
@@ -102,12 +106,12 @@ play boardV context = do
 
   if null vs
   then if null vs'
-       then  viewer boardV context
+       then  viewer context boardV
        else do print $ show turn ++ " cannot play. swapping.."
                atomically $ do writeTVar boardV
                                    $ (swap turn, board) : boardStates
                                return ()
-               play boardV context
+               play context boardV
   else do print board
           print $ "waiting for turn: " ++ show turn
           event <- wait context
@@ -130,10 +134,10 @@ play boardV context = do
                                 -- already something here
                                 Just _ ->  return turn
                   Nothing     -> return turn
-          play boardV context
+          play context boardV
 
-forever :: TVar [(Disc, Board)] -> DeviceContext -> IO ()
+forever :: BoardStateTrail -> DeviceContext -> IO ()
 forever boardV context= do
-        forkIO $ viewer boardV context
-        play boardV context
+        forkIO $ viewer context boardV
+        play context boardV
 
